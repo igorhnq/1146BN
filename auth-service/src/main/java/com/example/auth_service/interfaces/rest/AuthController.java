@@ -6,6 +6,7 @@ import com.example.auth_service.interfaces.rest.dto.auth.TokenResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,8 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
-    private PasswordLoginHandler passwordLoginHandler;
+    private final PasswordLoginHandler passwordLoginHandler;
 
+    @PostMapping("/login")
     public ResponseEntity<TokenResponse> loginWithPassword(@Valid @RequestBody PasswordLoginRequest request) {
         TokenResponse token = passwordLoginHandler.handle(request.email(), request.password());
 
