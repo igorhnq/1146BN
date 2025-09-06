@@ -3,6 +3,12 @@ package com.example.auth_service.interfaces.rest;
 import com.example.auth_service.application.auth.PasswordLoginHandler;
 import com.example.auth_service.interfaces.rest.dto.auth.PasswordLoginRequest;
 import com.example.auth_service.interfaces.rest.dto.auth.TokenResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +20,32 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
+@Tag(name = "Authentication", description = "Endpoints para autenticação de usuários")
 public class AuthController {
     private final PasswordLoginHandler passwordLoginHandler;
 
+    @Operation(
+        summary = "Login com email e senha", 
+        description = "Autentica um usuário com email e senha, retornando tokens JWT para acesso às APIs protegidas"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                responseCode = "200", 
+                description = "Login realizado com sucesso",
+                content = @Content(
+                    mediaType = "application/json", 
+                    schema = @Schema(implementation = TokenResponse.class)
+                )
+            ),
+            @ApiResponse(
+                responseCode = "401", 
+                description = "Credenciais inválidas - email ou senha incorretos"
+            ),
+            @ApiResponse(
+                responseCode = "400", 
+                description = "Dados de entrada inválidos - formato de email inválido ou campos obrigatórios ausentes"
+            )
+    })
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> loginWithPassword(@Valid @RequestBody PasswordLoginRequest request) {
         TokenResponse token = passwordLoginHandler.handle(request.email(), request.password());
